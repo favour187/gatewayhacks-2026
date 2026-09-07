@@ -88,6 +88,7 @@ button, input { font: inherit; color: inherit; }
 .container { max-width: 1040px; margin: 0 auto; padding: var(--space-5); }
 .page { display: grid; gap: var(--space-5); padding: var(--space-6) 0; }
 .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-4); }
 .stack { display: grid; gap: var(--space-4); }
 .row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
 .spread { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }

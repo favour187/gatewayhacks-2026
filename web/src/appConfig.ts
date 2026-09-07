@@ -1,4 +1,4 @@
 export const APP = {
-  name: "PocketPath",
-  build: "scaffold",
+    name: "PocketPath",
+    build: "1.0",
 };

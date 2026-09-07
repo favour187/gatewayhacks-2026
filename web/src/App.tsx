@@ -1,9 +1,8 @@
 import { AuthProvider } from "./lib/auth";
+import { FinApp } from "./features/finlit/FinApp";
 import { APP } from "./appConfig";
-
 export default function App() {
-  return (
-    <AuthProvider>
+    return (<AuthProvider>
       <header className="app-header">
         <div className="app-brand">
           <span className="app-logo">◈</span>
@@ -11,8 +10,9 @@ export default function App() {
         </div>
       </header>
       <main className="app-main">
-        <p>{APP.name}</p>
+        <div className="container">
+          <FinApp />
+        </div>
       </main>
-    </AuthProvider>
-  );
+    </AuthProvider>);
 }
