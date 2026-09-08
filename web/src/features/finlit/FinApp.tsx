@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { finlitApi } from "./api";
+import { Assessment } from "./Assessment";
+import { Coach } from "./Coach";
 import { Goals } from "./Goals";
 import { Learn } from "./Learn";
+import { Planner } from "./Planner";
 import { Sim } from "./Sim";
 import { money, pct, qualityLabel } from "./format";
 import { useAuth } from "../../lib/auth";
 import { Badge, Button, Card, ErrorBanner, Input, ProgressBar, Spinner, cx } from "../../ui/components";
 import type { Overview } from "./types";
-type View = "landing" | "home" | "learn" | "sim" | "goals";
+type View = "landing" | "home" | "learn" | "sim" | "goals" | "planner" | "assess_pre" | "assess_post";
 export function FinApp() {
     const auth = useAuth();
     const [view, setView] = useState<View>("landing");
@@ -19,7 +22,7 @@ export function FinApp() {
         try {
             const data = await finlitApi.overview();
             setOverview(data);
-            setView("home");
+            setView((v) => (v === "landing" ? "home" : v));
         }
         catch (err) {
             setError((err as Error).message);
@@ -42,11 +45,13 @@ export function FinApp() {
     }
     const p = overview.profile;
     return (<div>
-      <nav className="row" style={{ padding: "14px 0", gap: 8 }}>
+      <nav className="spread" style={{ padding: "14px 0", gap: 8, flexWrap: "wrap" }}>
+        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
         {([
             ["home", "Dashboard"],
             ["learn", "Learn"],
             ["sim", "Money moves"],
+            ["planner", "Planner"],
             ["goals", "Goals"],
         ] as [
             View,
@@ -54,6 +59,11 @@ export function FinApp() {
         ][]).map(([v, label]) => (<button key={v} className={cx("btn", view === v ? "btn-primary" : "btn-secondary", "btn-sm")} onClick={() => setView(v)}>
             {label}
           </button>))}
+        </div>
+        <div className="row" style={{ gap: 8 }}>
+          <span style={{ fontSize: 13, color: "var(--text-2)" }}>{auth.user.display_name}</span>
+          <Button variant="ghost" size="sm" onClick={() => void auth.logout()}>Sign out</Button>
+        </div>
       </nav>
       {error && <ErrorBanner message={error}/>}
       {view === "home" && (<div className="page">
@@ -74,14 +84,22 @@ export function FinApp() {
             <Card className="stack">
               <span className="spread">
                 <h3 style={{ margin: 0 }}>Assessment</h3>
-                <Badge tone="neutral">pre {pct(p.pre_score)} → post {pct(p.post_score)}</Badge>
+                <Badge tone={p.post_taken && p.score_gain > 0 ? "success" : "neutral"}>{p.pre_taken ? `baseline ${pct(p.pre_score)}` : "no baseline"}{p.post_taken ? ` → now ${pct(p.post_score)}` : ""}</Badge>
               </span>
-              <ProgressBar value={p.post_score || p.pre_score} label={p.post_score > 0 ? `Current · ${pct(p.post_score)}` : `Baseline · ${pct(p.pre_score)}`}/>
+              <ProgressBar value={p.post_taken ? p.post_score : p.pre_score} label={p.post_taken ? `Latest · ${pct(p.post_score)}` : p.pre_taken ? `Baseline · ${pct(p.pre_score)}` : "Not measured yet"}/>
               <p style={{ margin: 0, fontSize: 13, color: "var(--text-2)" }}>
-                {p.score_gain > 0
-                ? `You gained ${pct(p.score_gain)} since the baseline.`
-                : "Take the pre-assessment in Learn to set your baseline."}
+                {p.post_taken
+                ? p.score_gain > 0
+                    ? `You gained ${Math.round(p.score_gain)} points since the baseline.`
+                    : "No gain yet — review the modules you found hardest and retake."
+                : p.pre_taken
+                ? "Baseline set. Finish the modules, then take the post-assessment."
+                : "Take the 6-question baseline first so your progress is measurable."}
               </p>
+              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                {!p.pre_taken && <Button size="sm" onClick={() => setView("assess_pre")}>Take baseline</Button>}
+                {p.pre_taken && <Button size="sm" variant={overview.modules_done > 0 ? "primary" : "secondary"} onClick={() => setView("assess_post")}>{p.post_taken ? "Retake post-assessment" : "Post-assessment"}</Button>}
+              </div>
             </Card>
             <Card className="stack">
               <span className="spread">
@@ -126,7 +144,11 @@ export function FinApp() {
             </Card>
           </div>
         </div>)}
+      {view === "home" && <div style={{ marginTop: 16 }}><Coach compact /></div>}
+      {view === "assess_pre" && <Assessment kind="pre" onDone={() => void load()} onBack={() => setView("home")}/>}
+      {view === "assess_post" && <Assessment kind="post" onDone={() => void load()} onBack={() => setView("home")}/>}
       {view === "learn" && <Learn onDone={() => void load()}/>}
+      {view === "planner" && <Planner onDone={() => void load()}/>}
       {view === "sim" && <Sim onDone={() => void load()}/>}
       {view === "goals" && <Goals onDone={() => void load()}/>}
     </div>);
@@ -173,9 +195,9 @@ function Landing() {
 
       <div className="grid-2" style={{ maxWidth: 900, margin: "0 auto" }}>
         {[
-            ["📚", "Learn", "Six short modules: budgets, saving, credit, spending traps, investing, and goal math."],
+            ["📚", "Learn", "Six short modules: budgets, saving, credit, spending traps, investing, and goal math — each with a 3-question check that explains every answer."],
             ["🎮", "Decide", "Run 'Money Moves' — real-life scenarios where every choice moves your wallet, debt and confidence."],
-            ["📈", "Prove it", "Pre/post assessment plus a decision-quality score. Your learning shows up as numbers."],
+            ["🧮", "Apply it", "The Planner takes your real allowance or paycheck, in your currency, and compares it with the 50/30/20 guide. A coach explains what to change."],
         ].map(([icon, title, body], i) => (<Card key={title} style={{ textAlign: "left" }}>
             <div style={{ fontSize: 28 }}>{icon}</div>
             <h3 style={{ margin: "10px 0 6px" }}>{i + 1}. {title}</h3>

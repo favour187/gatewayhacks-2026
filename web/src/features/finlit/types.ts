@@ -8,6 +8,8 @@ export interface SimState {
 export interface Profile {
     pre_score: number;
     post_score: number;
+    pre_taken: boolean;
+    post_taken: boolean;
     score_gain: number;
     streak: number;
     sim: SimState;
@@ -108,4 +110,57 @@ export interface Overview {
     modules_total: number;
     goals: Goal[];
     sim_history_count: number;
+}
+
+export interface PlannerMeta {
+    currencies: Record<string, { symbol: string; name: string; decimals: number }>;
+    categories: { key: string; label: string; bucket: "needs" | "wants" | "savings" }[];
+    target_split: Record<string, number>;
+    periods: string[];
+}
+export interface PlanLineIn {
+    category: string;
+    amount: number;
+}
+export interface PlanIn {
+    income: number;
+    period: "weekly" | "biweekly" | "monthly";
+    currency: string;
+    lines: PlanLineIn[];
+}
+export interface PlanResult {
+    income: number;
+    period: string;
+    currency: string;
+    symbol: string;
+    buckets: Record<"needs" | "wants" | "savings", number>;
+    shares: Record<"needs" | "wants" | "savings", number>;
+    target_shares: Record<string, number>;
+    unallocated: number;
+    overspend: number;
+    health: number;
+    verdict: string;
+    tips: string[];
+    lines: { category: string; label: string; bucket: string; amount: number }[];
+    annual: Record<string, number>;
+}
+export interface SavedPlan {
+    id: string;
+    input: PlanIn;
+    result: PlanResult;
+    updated_at: string;
+}
+export interface FinancingOut {
+    price: number;
+    total_paid: number;
+    extra_paid: number;
+    extra_pct: number;
+    implied_apr: number | null;
+    months: number;
+    months_to_save: number | null;
+}
+export interface CoachReply {
+    reply: string;
+    provider: string;
+    used_fallback: boolean;
 }

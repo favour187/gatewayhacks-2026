@@ -17,3 +17,7 @@ export function qualityLabel(quality: number): string {
         return "Okay";
     return "Costly";
 }
+
+export function fmtCur(value: number, symbol: string, decimals = 0): string {
+    return `${symbol}${value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals })}`;
+}
