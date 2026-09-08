@@ -2,6 +2,8 @@
 
 > **GatewayHacks 2026 · Track 2, Equity in Education.** A learn-→-decide-→-apply financial-literacy app for 13–22-year-olds that measures whether it worked: a baseline test, eight explained-answer modules, a consequences simulator, a real-money planner in the student's own currency, and a coach that only ever talks about *their* numbers. Runs anywhere, offline, no API keys.
 
+**Live demo:** https://pocketpath-ctbb.onrender.com · demo login `demo@example.com` / `demo-password-123` · health: `https://pocketpath-ctbb.onrender.com/api/health` *(free tier: first load after idle takes ~1 min)*
+
 ![Planner](docs/screenshots/05-planner.png)
 
 ## The problem
@@ -71,7 +73,7 @@ The repo ships a [`render.yaml`](render.yaml) Blueprint: one Docker web service,
 
 1. **Neon** (free): create a project → copy the connection string (`postgresql://…?sslmode=require`).
 2. **Render**: Dashboard → *New* → *Blueprint* → select this repo → when prompted, paste the Neon URL into `DATABASE_URL` → *Apply*.
-3. Open `https://pocketpath.onrender.com` (or whatever name Render assigns). Health: `/api/health`. Judges can log in with `demo@example.com / demo-password-123` (`SEED_DEMO_USER=true`).
+3. Open the service URL — this project's is https://pocketpath-ctbb.onrender.com. Health: `/api/health`. Judges can log in with `demo@example.com / demo-password-123` (`SEED_DEMO_USER=true`).
 
 Notes: `postgres://` and `postgresql://` URLs are auto-mapped to the psycopg 3 driver (`pip install ".[postgres]"`); tables are created on first boot. Free web services sleep after 15 min idle (~1 min cold start) — open the URL a minute before a live demo. Without `DATABASE_URL` the container falls back to SQLite on its ephemeral disk (data resets on restart).
 
