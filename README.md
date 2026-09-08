@@ -64,7 +64,7 @@ Teacher/classroom dashboard (aggregate gains, anonymised); localised scenario pa
 
 ## AI-assistance disclosure
 
-Built with AI coding assistance (Claude-based agent tooling on the Arena.ai platform) under the author's direction; all design, content and code were reviewed and are understood by the author. See [docs/COMPLIANCE.md](docs/COMPLIANCE.md).
+Built with AI coding assistance (Claude-based agent tooling on the Arena.ai platform) under the author's direction; all design, content and code were reviewed and are understood by the author.
 
 
 ## Deploy (Render free tier + Neon Postgres)
