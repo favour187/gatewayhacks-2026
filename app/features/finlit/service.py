@@ -257,7 +257,7 @@ def coach(
         extra["financing"] = financing(financing_offer)
     ctx = coach_context(db, user_id, extra)
     messages = ai_skills.build_messages(message, ctx)
-    result = gateway.chat(system=messages[0].content, user=message, max_tokens=400)
+    result = gateway.chat(system=messages[0].content, user=message, max_tokens=1000)
     return {
         "reply": result.text,
         "provider": result.provider,
