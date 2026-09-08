@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-
 @dataclass(slots=True)
 class SimState:
     balance: float = 100.0
@@ -26,7 +25,6 @@ class SimState:
             "quality": self.quality,
         }
 
-
 @dataclass(slots=True)
 class ChoiceOutcome:
     money: float = 0.0
@@ -42,7 +40,6 @@ class ChoiceOutcome:
         state.quality_sum += self.quality
         return state
 
-
 def months_to_target(target: float, weekly: float) -> int | None:
     if target <= 0:
         return 0
@@ -50,7 +47,6 @@ def months_to_target(target: float, weekly: float) -> int | None:
         return None
     monthly = weekly * 52.0 / 12.0
     return max(1, math.ceil(target / monthly))
-
 
 def target_date(target: float, weekly: float, start: date | None = None) -> date | None:
     months = months_to_target(target, weekly)
@@ -61,12 +57,10 @@ def target_date(target: float, weekly: float, start: date | None = None) -> date
     month = (start.month - 1 + months) % 12 + 1
     return date(year, month, min(start.day, 28))
 
-
 def progress_pct(contributed: float, target: float) -> float:
     if target <= 0:
         return 0.0
     return round(min(100.0, contributed / target * 100.0), 1)
-
 
 def grade_quiz(answers: list[tuple[str, int]], bank: dict[str, Any]) -> dict[str, Any]:
     correct = 0
@@ -80,7 +74,6 @@ def grade_quiz(answers: list[tuple[str, int]], bank: dict[str, Any]) -> dict[str
         "total": total,
         "score": round(correct / total * 100.0, 1) if total else 0.0,
     }
-
 
 def outcome_delta(
     money: float, debt: float, confidence: float, quality: float

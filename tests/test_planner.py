@@ -10,10 +10,8 @@ from app.features.finlit.planner import (
     weeks_to_goal,
 )
 
-
 def lines(**amounts):
     return [PlanLine(category=k, amount=v) for k, v in amounts.items()]
-
 
 def test_plan_buckets_and_shares():
     res = build_plan(
@@ -36,13 +34,11 @@ def test_plan_buckets_and_shares():
     assert res.verdict == "Sharp plan"
     assert res.annual["savings"] == pytest.approx(3600)
 
-
 def test_overspend_is_penalised_and_explained():
     res = build_plan(500, "weekly", "NGN", lines(food=300, clothes=300, eating_out=100))
     assert res.overspend == 200
     assert res.health < 50
     assert any("more than you earn" in t for t in res.tips)
-
 
 def test_low_savings_gets_a_concrete_nudge():
     res = build_plan(
@@ -55,12 +51,10 @@ def test_low_savings_gets_a_concrete_nudge():
     assert any("Saving only 5%" in t for t in res.tips)
     assert res.health < 85
 
-
 def test_unallocated_money_flagged():
     res = build_plan(1000, "monthly", "EUR", lines(food=200, savings_goal=200))
     assert res.unallocated == 600
     assert any("no job" in t for t in res.tips)
-
 
 def test_plan_validation():
     with pytest.raises(ValueError):
@@ -72,7 +66,6 @@ def test_plan_validation():
     with pytest.raises(ValueError):
         build_plan(100, "monthly", "USD", lines(caviar=10))
 
-
 def test_suggest_split_and_weeks():
     split = suggest_split(200, "GBP", "weekly")
     assert (split["needs"], split["wants"], split["savings"]) == (100, 60, 40)
@@ -80,7 +73,6 @@ def test_suggest_split_and_weeks():
     assert weeks_to_goal(600, 50, already=300) == 6
     assert weeks_to_goal(600, 0) is None
     assert weeks_to_goal(100, 50, already=100) == 0
-
 
 def test_financing_cost_reveals_the_extra_and_apr():
     offer = financing_cost(900, 45, 24)
@@ -90,7 +82,6 @@ def test_financing_cost_reveals_the_extra_and_apr():
     assert 15 < offer["implied_apr"] < 25
     zero = financing_cost(900, 75, 12)
     assert zero["extra_paid"] == 0 and zero["implied_apr"] == 0.0
-
 
 def test_planner_api_preview_save_and_coach(client):
     meta = client.get("/api/finance/planner/meta").json()
@@ -165,7 +156,6 @@ def test_planner_api_preview_save_and_coach(client):
         "/api/finance/planner/preview", json={**payload, "period": "yearly"}
     )
     assert bad.status_code == 422
-
 
 def test_assessment_endpoint_and_pre_post_gain(client):
     user = create_user(client, email="assess@example.com")

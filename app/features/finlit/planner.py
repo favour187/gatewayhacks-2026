@@ -1,9 +1,3 @@
-"""Paycheck / allowance planner — the 'apply it to your own life' half of PocketPath.
-
-Pure functions, no I/O.  Amounts are in whatever currency the student picked;
-only the *shape* of the plan (needs / wants / savings split, weeks to a goal,
-the cost of a financed purchase) is computed here.
-"""
 
 from __future__ import annotations
 
@@ -68,7 +62,6 @@ CATEGORY_LABELS: dict[str, str] = {
 TARGET_SPLIT = {"needs": 0.50, "wants": 0.30, "savings": 0.20}
 PERIODS = {"weekly": 52, "biweekly": 26, "monthly": 12}
 
-
 @dataclass(slots=True)
 class PlanLine:
     category: str
@@ -77,7 +70,6 @@ class PlanLine:
     @property
     def bucket(self) -> str:
         return CATEGORIES[self.category]
-
 
 @dataclass(slots=True)
 class PlanResult:
@@ -111,7 +103,6 @@ class PlanResult:
             "lines": self.lines,
             "annual": {k: round(v) for k, v in self.annual.items()},
         }
-
 
 def build_plan(
     income: float, period: str, currency: str, lines: list[PlanLine]
@@ -167,13 +158,11 @@ def build_plan(
         annual=annual,
     )
 
-
 def _fmt(amount: float, currency: str) -> str:
     meta = CURRENCIES[currency]
     if meta["decimals"] == 0:
         return f"{meta['symbol']}{amount:,.0f}"
     return f"{meta['symbol']}{amount:,.2f}"
-
 
 def _score(
     income, buckets, shares, unallocated, overspend, currency, lines
@@ -236,9 +225,7 @@ def _score(
         verdict = "Needs a reset"
     return score, verdict, tips[:4]
 
-
 def suggest_split(income: float, currency: str, period: str) -> dict[str, Any]:
-    """What 50/30/20 looks like for this income — the starting template."""
     if currency not in CURRENCIES:
         raise ValueError("Unknown currency")
     return {
@@ -251,9 +238,7 @@ def suggest_split(income: float, currency: str, period: str) -> dict[str, Any]:
         "savings": round(income * 0.20, 2),
     }
 
-
 def financing_cost(price: float, monthly_payment: float, months: int) -> dict[str, Any]:
-    """The true cost of 'only X per month' offers."""
     if price <= 0 or monthly_payment <= 0 or months <= 0:
         raise ValueError("price, monthly_payment and months must be positive")
     total = monthly_payment * months
@@ -268,9 +253,7 @@ def financing_cost(price: float, monthly_payment: float, months: int) -> dict[st
         "months": months,
     }
 
-
 def _implied_apr(price: float, payment: float, months: int) -> float | None:
-    """Solve for the monthly rate r in price = payment * (1 - (1+r)^-n) / r via bisection."""
     if payment * months <= price:
         return 0.0
     lo, hi = 0.0, 1.0
@@ -282,7 +265,6 @@ def _implied_apr(price: float, payment: float, months: int) -> float | None:
         else:
             hi = mid
     return lo * 12
-
 
 def weeks_to_goal(target: float, weekly: float, already: float = 0.0) -> int | None:
     remaining = max(0.0, target - already)

@@ -3,7 +3,6 @@ from app.core.testing import auth_headers, create_user
 from app.features.finlit.content import ASSESSMENT, MODULES, SCENARIOS
 from app.features.finlit.core import months_to_target, progress_pct, target_date
 
-
 def test_projection_math():
     assert months_to_target(600, 50) == 3
     assert months_to_target(600, 0) is None
@@ -11,12 +10,10 @@ def test_projection_math():
     assert progress_pct(250, 1000) == 25.0
     assert progress_pct(1200, 1000) == 100.0
 
-
 def test_target_date():
     d = target_date(600, 50, date(2026, 9, 6))
     assert d is not None
     assert d == date(2026, 12, 6)
-
 
 def test_content_complete():
     for module in MODULES.values():
@@ -29,7 +26,6 @@ def test_content_complete():
         assert len(s.choices) >= 3
         for c in s.choices:
             assert "quality" in c and "explanation" in c
-
 
 def test_full_api_flow(client):
     headers = auth_headers(create_user(client, email="pocket@example.com")["token"])
@@ -113,9 +109,7 @@ def test_full_api_flow(client):
     assert bad.status_code == 422
     assert client.get("/api/finance/overview").status_code == 401
 
-
 def test_quiz_answers_are_not_always_first_option():
-    """Guards against a guessable quiz: the correct option must move around."""
     positions = {q["answer_index"] for m in MODULES.values() for q in m.quiz}
     assert len(positions) >= 3
     assert len({q["answer_index"] for q in ASSESSMENT}) >= 2
@@ -127,7 +121,6 @@ def test_quiz_answers_are_not_always_first_option():
         ids = [c["choice_id"] for c in scenario.choices]
         assert len(ids) == len(set(ids))
         assert max(c["quality"] for c in scenario.choices) >= 0.8
-
 
 def test_coach_scam_question_is_grounded_offline(client):
     headers = auth_headers(create_user(client, email="scam@example.com")["token"])

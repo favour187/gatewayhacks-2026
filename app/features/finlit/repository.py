@@ -7,7 +7,6 @@ from sqlalchemy import ForeignKey, String, Text, Uuid, select
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from app.core.db import Base, TimestampsMixin, UUIDMixin, iso_utc, utcnow
 
-
 class FinProfile(UUIDMixin, TimestampsMixin, Base):
     __tablename__ = "finlit_profiles"
     user_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
@@ -50,7 +49,6 @@ class FinProfile(UUIDMixin, TimestampsMixin, Base):
             },
         }
 
-
 class ModuleProgress(UUIDMixin, Base):
     __tablename__ = "finlit_module_progress"
     user_id: Mapped[str] = mapped_column(String(64), index=True)
@@ -69,7 +67,6 @@ class ModuleProgress(UUIDMixin, Base):
             "completed_at": iso_utc(self.completed_at) if self.completed_at else None,
         }
 
-
 class SimHistory(UUIDMixin, Base):
     __tablename__ = "finlit_sim_history"
     user_id: Mapped[str] = mapped_column(String(64), index=True)
@@ -86,7 +83,6 @@ class SimHistory(UUIDMixin, Base):
             "delta": json.loads(self.delta_json) if self.delta_json else {},
             "created_at": iso_utc(self.created_at),
         }
-
 
 class GoalEntity(UUIDMixin, TimestampsMixin, Base):
     __tablename__ = "finlit_goals"
@@ -126,7 +122,6 @@ class GoalEntity(UUIDMixin, TimestampsMixin, Base):
             "created_at": iso_utc(self.created_at),
         }
 
-
 class Contribution(UUIDMixin, Base):
     __tablename__ = "finlit_contributions"
     goal_id: Mapped[uuid.UUID] = mapped_column(
@@ -142,7 +137,6 @@ class Contribution(UUIDMixin, Base):
             "amount": self.amount,
             "created_at": iso_utc(self.created_at),
         }
-
 
 class BudgetPlan(UUIDMixin, TimestampsMixin, Base):
     __tablename__ = "finlit_budget_plans"
@@ -162,10 +156,8 @@ class BudgetPlan(UUIDMixin, TimestampsMixin, Base):
             "updated_at": iso_utc(self.updated_at),
         }
 
-
 def get_plan(db: Session, user_id: str) -> BudgetPlan | None:
     return db.scalar(select(BudgetPlan).where(BudgetPlan.user_id == user_id))
-
 
 def upsert_plan(db: Session, user_id: str, payload: dict, result: dict) -> BudgetPlan:
     row = get_plan(db, user_id)
@@ -178,7 +170,6 @@ def upsert_plan(db: Session, user_id: str, payload: dict, result: dict) -> Budge
     db.refresh(row)
     return row
 
-
 def get_or_create_profile(db: Session, user_id: str) -> FinProfile:
     profile = db.scalar(select(FinProfile).where(FinProfile.user_id == user_id))
     if profile is None:
@@ -187,7 +178,6 @@ def get_or_create_profile(db: Session, user_id: str) -> FinProfile:
         db.commit()
         db.refresh(profile)
     return profile
-
 
 def touch_profile(db: Session, profile: FinProfile) -> None:
     today = date.today()
@@ -200,11 +190,9 @@ def touch_profile(db: Session, profile: FinProfile) -> None:
     profile.last_activity = today
     db.commit()
 
-
 def module_progress(db: Session, user_id: str) -> dict[str, ModuleProgress]:
     rows = db.scalars(select(ModuleProgress).where(ModuleProgress.user_id == user_id))
     return {r.module_id: r for r in rows}
-
 
 def upsert_module_score(
     db: Session, user_id: str, module_id: str, score: float, passed: bool
@@ -232,7 +220,6 @@ def upsert_module_score(
     db.refresh(row)
     return row
 
-
 def record_sim_decision(
     db: Session, user_id: str, scenario_id: str, choice_id: str, delta: dict
 ) -> None:
@@ -246,7 +233,6 @@ def record_sim_decision(
     )
     db.commit()
 
-
 def sim_history(db: Session, user_id: str) -> list[SimHistory]:
     rows = db.scalars(
         select(SimHistory)
@@ -255,7 +241,6 @@ def sim_history(db: Session, user_id: str) -> list[SimHistory]:
     )
     return list(rows)
 
-
 def list_goals(db: Session, user_id: str) -> list[GoalEntity]:
     rows = db.scalars(
         select(GoalEntity)
@@ -263,7 +248,6 @@ def list_goals(db: Session, user_id: str) -> list[GoalEntity]:
         .order_by(GoalEntity.created_at.desc())
     )
     return list(rows)
-
 
 def create_goal(
     db: Session, user_id: str, name: str, target: float, weekly: float, apy: float = 0.0
@@ -274,14 +258,12 @@ def create_goal(
     db.refresh(goal)
     return goal
 
-
 def get_goal(db: Session, user_id: str, goal_id: str) -> GoalEntity | None:
     return db.scalar(
         select(GoalEntity).where(
             GoalEntity.id == uuid.UUID(goal_id), GoalEntity.user_id == user_id
         )
     )
-
 
 def add_contribution(db: Session, goal: GoalEntity, amount: float) -> Contribution:
     row = Contribution(goal_id=goal.id, amount=amount)

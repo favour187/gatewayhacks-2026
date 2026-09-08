@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Any
 
-
 class Module:
     def __init__(
         self,
@@ -17,7 +16,6 @@ class Module:
         self.lessons = lessons
         self.quiz = quiz
 
-
 class Scenario:
     def __init__(
         self, scenario_id: str, title: str, setup: str, choices: list[dict[str, Any]]
@@ -26,7 +24,6 @@ class Scenario:
         self.title = title
         self.setup = setup
         self.choices = choices
-
 
 MODULES: dict[str, Module] = {
     "budgeting": Module(
@@ -807,7 +804,6 @@ SCENARIOS: dict[str, Scenario] = {
     ),
 }
 
-
 def module_dict(module: Module) -> dict[str, Any]:
     return {
         "module_id": module.module_id,
@@ -817,17 +813,14 @@ def module_dict(module: Module) -> dict[str, Any]:
         "quiz_count": len(module.quiz),
     }
 
-
 def quiz_public(module: Module) -> list[dict[str, Any]]:
     return [
         {"question_id": q["question_id"], "stem": q["stem"], "options": q["options"]}
         for q in module.quiz
     ]
 
-
 def quiz_answer(module: Module, question_id: str) -> dict[str, Any] | None:
     return next((q for q in module.quiz if q["question_id"] == question_id), None)
-
 
 def scenario_dict(scenario: Scenario) -> dict[str, Any]:
     return {

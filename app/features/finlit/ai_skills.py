@@ -1,9 +1,3 @@
-"""Deterministic 'money coach' skills for the local AI provider.
-
-The coach never invents figures: everything it says about a student's plan
-comes from the COACH CONTEXT JSON that the service embeds in the system prompt.
-With an API key configured the same prompt drives a real LLM instead.
-"""
 
 from __future__ import annotations
 
@@ -24,7 +18,6 @@ SYSTEM_PROMPT = (
 
 MARKER = "COACH CONTEXT JSON:"
 
-
 def _ctx(system: str) -> dict[str, Any]:
     if MARKER not in system:
         return {}
@@ -32,7 +25,6 @@ def _ctx(system: str) -> dict[str, Any]:
         return json.loads(system.split(MARKER, 1)[1].strip())
     except json.JSONDecodeError:
         return {}
-
 
 def _money(ctx: dict[str, Any], value: float | None) -> str:
     if value is None:
@@ -44,7 +36,6 @@ def _money(ctx: dict[str, Any], value: float | None) -> str:
         if meta["decimals"] == 0
         else f"{meta['symbol']}{value:,.2f}"
     )
-
 
 class PlanReviewSkill:
     id = "plan-review"
@@ -96,7 +87,6 @@ class PlanReviewSkill:
             parts.append("Coach note: " + plan["tips"][0])
         return "\n\n".join(parts)
 
-
 class GoalSkill:
     id = "goal"
 
@@ -129,7 +119,6 @@ class GoalSkill:
         slowest = max(goals, key=lambda g: g.get("months_to_target") or 0)
         nxt = f"Next step: add a small automatic transfer for '{slowest['name']}' the day money arrives, before anything else."
         return "Where your goals stand:\n" + "\n".join(lines) + "\n\n" + nxt
-
 
 class DebtSkill:
     id = "debt"
@@ -179,7 +168,6 @@ class DebtSkill:
             base
             + "\n\nNext step: before any 'pay later' button, write down the total you would actually pay."
         )
-
 
 class ProgressSkill:
     id = "progress"
@@ -240,7 +228,6 @@ class ProgressSkill:
             )
         return "\n\n".join(msg)
 
-
 class ConceptSkill:
     id = "concept"
 
@@ -289,7 +276,6 @@ class ConceptSkill:
                 )
         return "Good question. The short version: know what comes in, decide where it goes before you spend it, keep a buffer for shocks, and let saving run on autopilot. Ask me about your plan, your goals, debt, or any of the eight modules."
 
-
 class ScamSkill:
     id = "scam-safety"
     TRIGGERS = (
@@ -318,9 +304,7 @@ class ScamSkill:
             "Next step: finish the Scams & digital money safety module and check any offer with a trusted adult before sending money."
         )
 
-
 class _ConceptFirst(ConceptSkill):
-    """Definition-style questions win over topic keywords ("what is compound interest?")."""
 
     id = "concept-definition"
 
@@ -333,7 +317,6 @@ class _ConceptFirst(ConceptSkill):
             and "my " not in t
         )
 
-
 LOCAL_SKILLS: list[Any] = [
     ScamSkill(),
     _ConceptFirst(),
@@ -343,7 +326,6 @@ LOCAL_SKILLS: list[Any] = [
     ProgressSkill(),
     ConceptSkill(),
 ]
-
 
 def build_messages(user_text: str, ctx: dict[str, Any] | None) -> list[AIMessage]:
     system = SYSTEM_PROMPT
@@ -355,6 +337,5 @@ def build_messages(user_text: str, ctx: dict[str, Any] | None) -> list[AIMessage
         AIMessage(role="system", content=system),
         AIMessage(role="user", content=user_text),
     ]
-
 
 __all__ = ["LOCAL_SKILLS", "SYSTEM_PROMPT", "build_messages", "CATEGORY_LABELS"]

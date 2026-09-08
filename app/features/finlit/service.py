@@ -6,7 +6,6 @@ from app.core.ai import AIGateway, get_gateway
 from app.features.finlit import ai_skills, content, planner, repository
 from app.features.finlit.core import outcome_delta
 
-
 def overview(db: Session, user_id: str) -> dict[str, Any]:
     profile = repository.get_or_create_profile(db, user_id)
     progress = repository.module_progress(db, str(user_id))
@@ -32,7 +31,6 @@ def overview(db: Session, user_id: str) -> dict[str, Any]:
         "goals": [g.to_dict() for g in goals],
         "sim_history_count": len(repository.sim_history(db, str(user_id))),
     }
-
 
 def assess(
     db: Session, user_id: str, answers: list[dict[str, Any]], kind: str
@@ -68,7 +66,6 @@ def assess(
         "profile": profile.to_dict(),
     }
 
-
 def grade_module(
     db: Session, user_id: str, module_id: str, answers: list[dict[str, Any]]
 ) -> dict[str, Any]:
@@ -102,7 +99,6 @@ def grade_module(
         "explanations": explanations,
         "progress": row.to_dict(),
     }
-
 
 def simulate(
     db: Session, user_id: str, scenario_id: str, choice_id: str
@@ -152,7 +148,6 @@ def simulate(
         "history": [h.to_dict() for h in repository.sim_history(db, str(user_id))],
     }
 
-
 def reset_sim(db: Session, user_id: str) -> dict[str, Any]:
     profile = repository.get_or_create_profile(db, str(user_id))
     profile.sim_balance = 100.0
@@ -162,7 +157,6 @@ def reset_sim(db: Session, user_id: str) -> dict[str, Any]:
     profile.sim_quality_sum = 0.0
     db.commit()
     return profile.to_dict()
-
 
 def _state_from_profile(profile: Any) -> Any:
     from app.features.finlit.core import SimState
@@ -174,7 +168,6 @@ def _state_from_profile(profile: Any) -> Any:
         decisions=profile.sim_decisions,
         quality_sum=profile.sim_quality_sum,
     )
-
 
 def _grade_bank(pairs: list[tuple[str, int]], bank: dict[str, Any]) -> dict[str, Any]:
     correct = 0
@@ -188,7 +181,6 @@ def _grade_bank(pairs: list[tuple[str, int]], bank: dict[str, Any]) -> dict[str,
         "total": total,
         "score": round(correct / total * 100.0, 1) if total else 0.0,
     }
-
 
 def build_plan(payload: dict[str, Any]) -> dict[str, Any]:
     lines = [
@@ -204,13 +196,11 @@ def build_plan(payload: dict[str, Any]) -> dict[str, Any]:
     )
     return result.to_dict()
 
-
 def save_plan(db: Session, user_id: str, payload: dict[str, Any]) -> dict[str, Any]:
     result = build_plan(payload)
     row = repository.upsert_plan(db, user_id, payload, result)
     repository.touch_profile(db, repository.get_or_create_profile(db, user_id))
     return row.to_dict()
-
 
 def financing(payload: dict[str, Any]) -> dict[str, Any]:
     out = planner.financing_cost(
@@ -222,7 +212,6 @@ def financing(payload: dict[str, Any]) -> dict[str, Any]:
         out["price"], float(payload["monthly_payment"])
     )
     return out
-
 
 def coach_context(
     db: Session, user_id: str, extra: dict[str, Any] | None = None
@@ -250,7 +239,6 @@ def coach_context(
     if extra:
         ctx.update({k: v for k, v in extra.items() if v is not None})
     return ctx
-
 
 def coach(
     db: Session,
