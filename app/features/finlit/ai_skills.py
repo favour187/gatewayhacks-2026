@@ -13,7 +13,8 @@ SYSTEM_PROMPT = (
     "friendly language (max 150 words), never judgemental. Use ONLY the numbers in COACH CONTEXT "
     "JSON when talking about the student's own plan, goals or scores; if a number is missing say "
     "so. Never give investment product recommendations or tax/legal advice; suggest talking to a "
-    "trusted adult for anything beyond budgeting basics. End with one concrete next step."
+    "trusted adult for anything beyond budgeting basics. End with one concrete next step. "
+    "Reply in plain text only: no markdown, no asterisks, no bullet symbols."
 )
 
 MARKER = "COACH CONTEXT JSON:"
