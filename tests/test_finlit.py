@@ -112,3 +112,33 @@ def test_full_api_flow(client):
     )
     assert bad.status_code == 422
     assert client.get("/api/finance/overview").status_code == 401
+
+
+def test_quiz_answers_are_not_always_first_option():
+    """Guards against a guessable quiz: the correct option must move around."""
+    positions = {q["answer_index"] for m in MODULES.values() for q in m.quiz}
+    assert len(positions) >= 3
+    assert len({q["answer_index"] for q in ASSESSMENT}) >= 2
+    for module in MODULES.values():
+        for q in module.quiz:
+            assert len(q["options"]) == 4
+            assert len(set(q["options"])) == 4
+    for scenario in SCENARIOS.values():
+        ids = [c["choice_id"] for c in scenario.choices]
+        assert len(ids) == len(set(ids))
+        assert max(c["quality"] for c in scenario.choices) >= 0.8
+
+
+def test_coach_scam_question_is_grounded_offline(client):
+    headers = auth_headers(create_user(client, email="scam@example.com")["token"])
+    res = client.post(
+        "/api/finance/coach",
+        headers=headers,
+        json={
+            "message": "Someone says they can double my money in two weeks, is it a scam?"
+        },
+    )
+    assert res.status_code == 200
+    text = res.json()["reply"].lower()
+    assert "scheme" in text or "scam" in text
+    assert "next step" in text

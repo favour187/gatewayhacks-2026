@@ -1,5 +1,6 @@
 import pytest
 
+from app.features.finlit.content import ASSESSMENT
 from app.core.testing import auth_headers, create_user
 from app.features.finlit.planner import (
     PlanLine,
@@ -15,7 +16,18 @@ def lines(**amounts):
 
 
 def test_plan_buckets_and_shares():
-    res = build_plan(1000, "monthly", "USD", lines(transport=200, food=300, entertainment=200, savings_goal=200, emergency_fund=100))
+    res = build_plan(
+        1000,
+        "monthly",
+        "USD",
+        lines(
+            transport=200,
+            food=300,
+            entertainment=200,
+            savings_goal=200,
+            emergency_fund=100,
+        ),
+    )
     assert res.buckets == {"needs": 500.0, "wants": 200.0, "savings": 300.0}
     assert res.shares["savings"] == pytest.approx(0.3)
     assert res.unallocated == 0
@@ -33,7 +45,12 @@ def test_overspend_is_penalised_and_explained():
 
 
 def test_low_savings_gets_a_concrete_nudge():
-    res = build_plan(40000, "monthly", "NGN", lines(transport=12000, food=15000, entertainment=9000, savings_goal=2000))
+    res = build_plan(
+        40000,
+        "monthly",
+        "NGN",
+        lines(transport=12000, food=15000, entertainment=9000, savings_goal=2000),
+    )
     assert res.shares["savings"] == pytest.approx(0.05)
     assert any("Saving only 5%" in t for t in res.tips)
     assert res.health < 85
@@ -77,7 +94,9 @@ def test_financing_cost_reveals_the_extra_and_apr():
 
 def test_planner_api_preview_save_and_coach(client):
     meta = client.get("/api/finance/planner/meta").json()
-    assert "NGN" in meta["currencies"] and any(c["key"] == "emergency_fund" for c in meta["categories"])
+    assert "NGN" in meta["currencies"] and any(
+        c["key"] == "emergency_fund" for c in meta["categories"]
+    )
 
     payload = {
         "income": 30000,
@@ -104,11 +123,22 @@ def test_planner_api_preview_save_and_coach(client):
     saved = client.put("/api/finance/planner", json=payload, headers=headers)
     assert saved.status_code == 200
     assert saved.json()["result"]["health"] == body["health"]
-    again = client.put("/api/finance/planner", json={**payload, "income": 35000}, headers=headers).json()
+    again = client.put(
+        "/api/finance/planner", json={**payload, "income": 35000}, headers=headers
+    ).json()
     assert again["result"]["income"] == 35000
-    assert client.get("/api/finance/planner", headers=headers).json()["plan"]["result"]["income"] == 35000
+    assert (
+        client.get("/api/finance/planner", headers=headers).json()["plan"]["result"][
+            "income"
+        ]
+        == 35000
+    )
 
-    coach = client.post("/api/finance/coach", json={"message": "How is my budget looking?"}, headers=headers)
+    coach = client.post(
+        "/api/finance/coach",
+        json={"message": "How is my budget looking?"},
+        headers=headers,
+    )
     assert coach.status_code == 200
     reply = coach.json()
     assert reply["provider"] == "local-demo"
@@ -116,15 +146,24 @@ def test_planner_api_preview_save_and_coach(client):
 
     offer = client.post(
         "/api/finance/coach",
-        json={"message": "Should I finance the phone?", "financing": {"price": 900, "monthly_payment": 45, "months": 24}},
+        json={
+            "message": "Should I finance the phone?",
+            "financing": {"price": 900, "monthly_payment": 45, "months": 24},
+        },
         headers=headers,
     ).json()
     assert "₦1,080" in offer["reply"] and "APR" in offer["reply"]
 
-    concept = client.post("/api/finance/coach", json={"message": "what is compound interest?"}, headers=headers).json()
+    concept = client.post(
+        "/api/finance/coach",
+        json={"message": "what is compound interest?"},
+        headers=headers,
+    ).json()
     assert "Compound growth" in concept["reply"]
 
-    bad = client.post("/api/finance/planner/preview", json={**payload, "period": "yearly"})
+    bad = client.post(
+        "/api/finance/planner/preview", json={**payload, "period": "yearly"}
+    )
     assert bad.status_code == 422
 
 
@@ -133,12 +172,26 @@ def test_assessment_endpoint_and_pre_post_gain(client):
     headers = auth_headers(user["token"])
     qs = client.get("/api/finance/assessment", headers=headers).json()["questions"]
     assert len(qs) >= 6 and "answer_index" not in qs[0]
-    wrong = [{"question_id": q["question_id"], "chosen_index": 1} for q in qs]
-    pre = client.post("/api/finance/assess", json={"kind": "pre", "answers": wrong}, headers=headers).json()
+    bank = {q["question_id"]: q["answer_index"] for q in ASSESSMENT}
+    wrong = [
+        {
+            "question_id": q["question_id"],
+            "chosen_index": (bank[q["question_id"]] + 1) % 4,
+        }
+        for q in qs
+    ]
+    pre = client.post(
+        "/api/finance/assess", json={"kind": "pre", "answers": wrong}, headers=headers
+    ).json()
     assert pre["score"] == 0 and pre["explanations"][0]["correct"] is False
     assert pre["profile"]["pre_taken"] is True and pre["profile"]["post_taken"] is False
     assert pre["profile"]["score_gain"] == 0
-    right = [{"question_id": q["question_id"], "chosen_index": 0} for q in qs]
-    post = client.post("/api/finance/assess", json={"kind": "post", "answers": right}, headers=headers).json()
+    right = [
+        {"question_id": q["question_id"], "chosen_index": bank[q["question_id"]]}
+        for q in qs
+    ]
+    post = client.post(
+        "/api/finance/assess", json={"kind": "post", "answers": right}, headers=headers
+    ).json()
     assert post["score"] == 100
     assert post["profile"]["score_gain"] == 100

@@ -4,6 +4,7 @@ Pure functions, no I/O.  Amounts are in whatever currency the student picked;
 only the *shape* of the plan (needs / wants / savings split, weeks to a goal,
 the cost of a financed purchase) is computed here.
 """
+
 from __future__ import annotations
 
 import math
@@ -112,7 +113,9 @@ class PlanResult:
         }
 
 
-def build_plan(income: float, period: str, currency: str, lines: list[PlanLine]) -> PlanResult:
+def build_plan(
+    income: float, period: str, currency: str, lines: list[PlanLine]
+) -> PlanResult:
     if income <= 0:
         raise ValueError("Income must be above zero.")
     if period not in PERIODS:
@@ -130,7 +133,9 @@ def build_plan(income: float, period: str, currency: str, lines: list[PlanLine])
     unallocated = max(0.0, income - total)
     overspend = max(0.0, total - income)
     shares = {k: (v / income) for k, v in buckets.items()}
-    health, verdict, tips = _score(income, buckets, shares, unallocated, overspend, currency, lines)
+    health, verdict, tips = _score(
+        income, buckets, shares, unallocated, overspend, currency, lines
+    )
     periods = PERIODS[period]
     annual = {
         "income": income * periods,
@@ -149,7 +154,16 @@ def build_plan(income: float, period: str, currency: str, lines: list[PlanLine])
         health=health,
         verdict=verdict,
         tips=tips,
-        lines=[{"category": l.category, "label": CATEGORY_LABELS[l.category], "bucket": l.bucket, "amount": round(l.amount, 2)} for l in lines if l.amount > 0],
+        lines=[
+            {
+                "category": l.category,
+                "label": CATEGORY_LABELS[l.category],
+                "bucket": l.bucket,
+                "amount": round(l.amount, 2),
+            }
+            for l in lines
+            if l.amount > 0
+        ],
         annual=annual,
     )
 
@@ -161,34 +175,56 @@ def _fmt(amount: float, currency: str) -> str:
     return f"{meta['symbol']}{amount:,.2f}"
 
 
-def _score(income, buckets, shares, unallocated, overspend, currency, lines) -> tuple[int, str, list[str]]:
+def _score(
+    income, buckets, shares, unallocated, overspend, currency, lines
+) -> tuple[int, str, list[str]]:
     tips: list[str] = []
     score = 100.0
     if overspend > 0:
         score -= min(60.0, overspend / income * 200)
-        tips.append(f"You are planning to spend {_fmt(overspend, currency)} more than you earn. Cut wants first — every plan must balance before it can grow.")
+        tips.append(
+            f"You are planning to spend {_fmt(overspend, currency)} more than you earn. Cut wants first — every plan must balance before it can grow."
+        )
     sav = shares["savings"]
     if sav >= 0.20:
-        tips.append(f"Saving {sav:.0%} — you are at or above the 20% target. That is the habit that compounds.")
+        tips.append(
+            f"Saving {sav:.0%} — you are at or above the 20% target. That is the habit that compounds."
+        )
     elif sav >= 0.10:
         score -= (0.20 - sav) * 150
-        tips.append(f"Saving {sav:.0%}. Nudge it toward 20%: moving {_fmt((0.20 - sav) * income, currency)} from wants gets you there.")
+        tips.append(
+            f"Saving {sav:.0%}. Nudge it toward 20%: moving {_fmt((0.20 - sav) * income, currency)} from wants gets you there."
+        )
     else:
         score -= 25 + (0.10 - sav) * 150
-        tips.append(f"Saving only {sav:.0%}. Even {_fmt(0.10 * income, currency)} per period, moved *before* you spend, changes the story.")
+        tips.append(
+            f"Saving only {sav:.0%}. Even {_fmt(0.10 * income, currency)} per period, moved *before* you spend, changes the story."
+        )
     if shares["wants"] > 0.40:
         score -= (shares["wants"] - 0.40) * 120
-        top = max((l for l in lines if l.bucket == "wants"), key=lambda l: l.amount, default=None)
+        top = max(
+            (l for l in lines if l.bucket == "wants"),
+            key=lambda l: l.amount,
+            default=None,
+        )
         if top:
-            tips.append(f"Wants are {shares['wants']:.0%} of income; the biggest is {CATEGORY_LABELS[top.category].lower()} at {_fmt(top.amount, currency)}. Halving that alone frees {_fmt(top.amount / 2, currency)}.")
+            tips.append(
+                f"Wants are {shares['wants']:.0%} of income; the biggest is {CATEGORY_LABELS[top.category].lower()} at {_fmt(top.amount, currency)}. Halving that alone frees {_fmt(top.amount / 2, currency)}."
+            )
     if shares["needs"] > 0.65:
-        tips.append(f"Needs take {shares['needs']:.0%} — tight, and common for students. Protect a small savings line anyway; the amount matters less than the habit.")
+        tips.append(
+            f"Needs take {shares['needs']:.0%} — tight, and common for students. Protect a small savings line anyway; the amount matters less than the habit."
+        )
     if unallocated > 0.05 * income:
         score -= min(15.0, unallocated / income * 50)
-        tips.append(f"{_fmt(unallocated, currency)} has no job. Unassigned money leaks — give it a name (emergency fund is a good first one).")
+        tips.append(
+            f"{_fmt(unallocated, currency)} has no job. Unassigned money leaks — give it a name (emergency fund is a good first one)."
+        )
     emergency = sum(l.amount for l in lines if l.category == "emergency_fund")
     if emergency <= 0 and overspend == 0:
-        tips.append("No emergency-fund line yet. A buffer of one period's needs is what stops a broken phone from becoming debt.")
+        tips.append(
+            "No emergency-fund line yet. A buffer of one period's needs is what stops a broken phone from becoming debt."
+        )
     score = int(max(0, min(100, round(score))))
     if score >= 85:
         verdict = "Sharp plan"

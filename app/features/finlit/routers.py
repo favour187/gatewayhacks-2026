@@ -75,7 +75,11 @@ def overview(
 def assessment(user: User = Depends(get_current_user)) -> dict:
     return {
         "questions": [
-            {"question_id": q["question_id"], "stem": q["stem"], "options": q["options"]}
+            {
+                "question_id": q["question_id"],
+                "stem": q["stem"],
+                "options": q["options"],
+            }
             for q in content.ASSESSMENT
         ]
     }
@@ -275,7 +279,9 @@ def coach(
             str(user.id),
             message=payload.message,
             plan=payload.plan.model_dump() if payload.plan else None,
-            financing_offer=payload.financing.model_dump() if payload.financing else None,
+            financing_offer=(
+                payload.financing.model_dump() if payload.financing else None
+            ),
         )
     except ValueError as exc:
         raise ValidationFailedError(str(exc)) from exc

@@ -1,6 +1,6 @@
 # 💠 PocketPath — money skills for students, with the results measured
 
-> **GatewayHacks 2026 · Track 2, Equity in Education.** A learn-→-decide-→-apply financial-literacy app for 13–22-year-olds that measures whether it worked: a baseline test, six explained-answer modules, a consequences simulator, a real-money planner in the student's own currency, and a coach that only ever talks about *their* numbers. Runs anywhere, offline, no API keys.
+> **GatewayHacks 2026 · Track 2, Equity in Education.** A learn-→-decide-→-apply financial-literacy app for 13–22-year-olds that measures whether it worked: a baseline test, eight explained-answer modules, a consequences simulator, a real-money planner in the student's own currency, and a coach that only ever talks about *their* numbers. Runs anywhere, offline, no API keys.
 
 ![Planner](docs/screenshots/05-planner.png)
 
@@ -13,8 +13,8 @@ Financial literacy is the life skill most schools never teach, and the students 
 | Step | Feature | Why it matters |
 |---|---|---|
 | **Measure first** | 6-question **baseline** with explained answers | The "before" photo. Without it, no one — student, teacher, judge — can tell whether the app helped. |
-| **Learn** | Six 4-minute modules (budgeting, saving, credit, spending traps, investing, goal maths), each with a 3-question check that explains **every** option | Short enough to finish on a phone between classes; explanations turn a wrong answer into the lesson. |
-| **Decide** | **Money Moves** — six real-life scenarios (birthday cash, phone upgrade, first paycheck, flash sale, friend loan, emergency). Each choice moves wallet, debt, confidence and a **decision-quality score** | Knowledge ≠ behaviour. The simulator makes the consequences visible before real money is involved. |
+| **Learn** | Eight 4-minute modules (budgeting, saving, credit, spending traps, investing, goal maths, earning & net pay, scams & digital safety), each with a 3-question check that explains **every** option | Short enough to finish on a phone between classes; explanations turn a wrong answer into the lesson. |
+| **Decide** | **Money Moves** — eight real-life scenarios (birthday cash, phone upgrade, first paycheck, flash sale, friend loan, emergency, the 'double your money' DM, the subscription pile). Each choice moves wallet, debt, confidence and a **decision-quality score** | Knowledge ≠ behaviour. The simulator makes the consequences visible before real money is involved. |
 | **Apply** | **Planner** — enter your real allowance / paycheck in any of 15 currencies (₦, KSh, ₹, Rs, ₱, R, $, €, £ …), split it into lines, and see it against the 50 / 30 / 20 guide with a **health score**, concrete tips ("move ₦3,200 from eating out to savings to hit 20%") and a yearly projection. Plus a **"real price of 'only X a month'"** calculator that reveals the total, the extra paid and the implied APR of any instalment offer | Localised numbers are what make it *usable* outside the US. The financing check targets the single most common trap for young earners. |
 | **Track** | **Goals** with weekly-rate maths and ETA dates; streaks | Turns intentions into dates. |
 | **Coach** | A **money coach** that answers "how is my budget looking?", "where do my goals stand?", "should I finance this phone?", "what is compound interest?" — grounded in the student's own plan, goals, scores and simulator state | Runs fully offline via deterministic skills; add any OpenAI-compatible key and the same grounded prompt drives an LLM. Never invents figures. |
@@ -45,7 +45,7 @@ cd web && npm install && npm run dev                 # http://localhost:5173 (pr
 
 One container: `docker compose up --build` → http://localhost:8000.
 Demo account (development mode): `demo@example.com` / `demo-password-123`.
-Tests: `python -m pytest` (15 tests).
+Tests: `python -m pytest` (17 tests).
 
 Optional `.env`: `AI_MODE=auto|local|remote`, `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` (any OpenAI-compatible endpoint). Without a key the coach uses the built-in deterministic skills.
 

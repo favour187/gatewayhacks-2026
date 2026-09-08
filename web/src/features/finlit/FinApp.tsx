@@ -195,7 +195,7 @@ function Landing() {
 
       <div className="grid-2" style={{ maxWidth: 900, margin: "0 auto" }}>
         {[
-            ["📚", "Learn", "Six short modules: budgets, saving, credit, spending traps, investing, and goal math — each with a 3-question check that explains every answer."],
+            ["📚", "Learn", "Eight short modules: budgets, saving, credit, spending traps, investing, goal math, earning, and scam safety — each with a 3-question check that explains every answer."],
             ["🎮", "Decide", "Run 'Money Moves' — real-life scenarios where every choice moves your wallet, debt and confidence."],
             ["🧮", "Apply it", "The Planner takes your real allowance or paycheck, in your currency, and compares it with the 50/30/20 guide. A coach explains what to change."],
         ].map(([icon, title, body], i) => (<Card key={title} style={{ textAlign: "left" }}>

@@ -61,7 +61,12 @@ def assess(
         }
         for q in content.ASSESSMENT
     ]
-    return {"kind": kind, **graded, "explanations": explanations, "profile": profile.to_dict()}
+    return {
+        "kind": kind,
+        **graded,
+        "explanations": explanations,
+        "profile": profile.to_dict(),
+    }
 
 
 def grade_module(
@@ -209,13 +214,19 @@ def save_plan(db: Session, user_id: str, payload: dict[str, Any]) -> dict[str, A
 
 def financing(payload: dict[str, Any]) -> dict[str, Any]:
     out = planner.financing_cost(
-        float(payload["price"]), float(payload["monthly_payment"]), int(payload["months"])
+        float(payload["price"]),
+        float(payload["monthly_payment"]),
+        int(payload["months"]),
     )
-    out["months_to_save"] = planner.weeks_to_goal(out["price"], float(payload["monthly_payment"]))
+    out["months_to_save"] = planner.weeks_to_goal(
+        out["price"], float(payload["monthly_payment"])
+    )
     return out
 
 
-def coach_context(db: Session, user_id: str, extra: dict[str, Any] | None = None) -> dict[str, Any]:
+def coach_context(
+    db: Session, user_id: str, extra: dict[str, Any] | None = None
+) -> dict[str, Any]:
     profile = repository.get_or_create_profile(db, user_id)
     progress = repository.module_progress(db, user_id)
     goals = repository.list_goals(db, user_id)
@@ -259,4 +270,8 @@ def coach(
     ctx = coach_context(db, user_id, extra)
     messages = ai_skills.build_messages(message, ctx)
     result = gateway.chat(system=messages[0].content, user=message, max_tokens=400)
-    return {"reply": result.text, "provider": result.provider, "used_fallback": result.used_fallback}
+    return {
+        "reply": result.text,
+        "provider": result.provider,
+        "used_fallback": result.used_fallback,
+    }

@@ -7,7 +7,7 @@ Start the stack (`uvicorn app.main:app --reload --port 8000`, `cd web && npm run
 | 0:00 | Landing | "Financial literacy is the life skill most schools skip — and the students who miss it pay for it with the first 'only forty a month' phone plan. Free resources are dollar-only, reading-heavy, and never check whether anyone learned anything. PocketPath fixes all three." |
 | 0:20 | Dashboard → **Take baseline** | "It starts by measuring. Six questions, no studying — the 'before' photo." |
 | 0:35 | Answer, submit, show explanations | "Every answer is explained, right or wrong. Baseline saved." |
-| 0:50 | Learn → Budgeting basics → grade | "Six four-minute modules. Each check explains every option — a wrong answer becomes the lesson, not a penalty." |
+| 0:50 | Learn → Budgeting basics → grade | "Eight four-minute modules. Each check explains every option — a wrong answer becomes the lesson, not a penalty." |
 | 1:10 | Money Moves → The phone upgrade → choose *Finance it* | "Knowing isn't doing. Money Moves puts real situations in front of you and tracks wallet, debt, confidence, and a decision-quality score. Financing the phone: 960 of debt and the score drops." |
 | 1:35 | Planner: currency NGN, income 40,000, template, tweak a line | "Then you apply it to *your* money. Pick your currency — naira here — enter what you actually get, and the planner scores it against the 50/30/20 guide with a concrete fix: exactly how much to move, and where." |
 | 2:05 | Financing check: 900 / 45 / 24 → Reveal | "And the most common trap gets its own tool: 'only 45 a month' is actually 1,080 for a 900 phone — 20 % extra, about 18 % APR — or you save the same 45 a month and own it outright in 20 months." |

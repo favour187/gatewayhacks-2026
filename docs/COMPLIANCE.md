@@ -20,7 +20,7 @@
 
 - **Created for the event, inside the window.** First commit 2026-09-07. `app/core/` is the author's generic infrastructure shared with other projects (no domain logic); everything in `app/features/finlit/`, `web/src/features/finlit/`, tests and docs is specific to PocketPath and was written for GatewayHacks.
 - **Track fit (Equity in Education).** Free, offline-capable financial-literacy curriculum with measurable learning outcomes, localised to 15 currencies so it is usable by students outside the US.
-- **Working software.** Full stack runs with zero API keys; 15 automated tests; browser-verified end-to-end flows (screenshots in `docs/screenshots/`).
+- **Working software.** Full stack runs with zero API keys; 17 automated tests; browser-verified end-to-end flows (screenshots in `docs/screenshots/`).
 - **AI tools disclosed** (below and in the README).
 - **Not submitted elsewhere.** This project is entered only in GatewayHacks 2026.
 

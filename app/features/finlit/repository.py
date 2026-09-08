@@ -35,7 +35,11 @@ class FinProfile(UUIDMixin, TimestampsMixin, Base):
             "post_score": self.post_score,
             "pre_taken": self.pre_attempts > 0,
             "post_taken": self.post_attempts > 0,
-            "score_gain": round(self.post_score - self.pre_score, 1) if self.post_attempts else 0.0,
+            "score_gain": (
+                round(self.post_score - self.pre_score, 1)
+                if self.post_attempts
+                else 0.0
+            ),
             "streak": self.streak,
             "sim": {
                 "balance": round(self.sim_balance, 2),
